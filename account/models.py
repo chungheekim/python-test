@@ -7,22 +7,24 @@ from django.db import models
 class AccountManager(BaseUserManager):
     use_in_migrations = True
 
-    def create_user(self, email, password):
+    def create_user(self, email, password, **extra_fields):
         if not email or not password:
             raise ValueError('must have user email and password')
 
-        user = self.model(
+        user = Account(
+            name=extra_fields.get('name'),
             email=self.normalize_email(email),
-        )
+            date_of_birth=extra_fields.get('date_of_birth'))
 
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, password):
+    def create_superuser(self, email, password, **extra_fields):
         user = self.create_user(
             email=self.normalize_email(email),
-            password=password
+            password=password,
+            **extra_fields
         )
 
         user.is_admin = True
